@@ -2,24 +2,38 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Calculadora de Promedio U</title>
+
+<!-- Importante para celulares -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de Promedio UCR</title>
+
 <style>
     body {
-     font-family: Arial;
-    background-image: url("UCR.jpeg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 20px;
+        font-family: Arial;
+
+        /* Mostrar imagen completa sin recortar */
+        background-image: url("UCR.jpeg");
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        /* Fondo detrás de la imagen si queda espacio */
+        background-color: black;
+
+        min-height: 100vh;
+        padding: 20px;
     }
+
     .card {
         max-width: 400px;
         margin: auto;
-        background: white;
+        background: rgba(255,255,255,0.88);
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 0 10px #ccc;
+        box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
+
     input {
         width: 100%;
         padding: 8px;
@@ -27,6 +41,7 @@
         border-radius: 5px;
         border: 1px solid #ccc;
     }
+
     button {
         width: 100%;
         padding: 10px;
@@ -36,8 +51,23 @@
         border: none;
         border-radius: 5px;
         font-size: 16px;
+        cursor: pointer;
     }
+
+    button:hover {
+        background: #006bd1;
+    }
+
+    #resultado, #detalle {
+        margin-top: 20px;
+        padding: 10px;
+        background: rgba(255,255,255,0.85);
+        border-radius: 5px;
+        font-size: 15px;
+    }
+
 </style>
+
 </head>
 <body>
 
@@ -50,10 +80,13 @@
     <button onclick="generarInputs()">Siguiente</button>
 
     <div id="inputs"></div>
+
     <div id="resultado"></div>
+    <div id="detalle"></div>
 </div>
 
 <script>
+
 function generarInputs() {
     const n = parseInt(document.getElementById("cantidad").value);
     const contenedor = document.getElementById("inputs");
@@ -63,10 +96,9 @@ function generarInputs() {
         contenedor.innerHTML += `
             <label>Nota del curso ${i}:</label>
             <input type="number" id="nota${i}" min="0" max="100">
-        `;
-        contenedor.innerHTML += `
-            <label>creditos del curso ${i}:</label>
-            <input type="number" id="nota${i}" min="0" max="100">
+
+            <label>Créditos del curso ${i}:</label>
+            <input type="number" id="creditos${i}" min="0" max="10">
         `;
     }
 
@@ -77,17 +109,39 @@ function generarInputs() {
 
 function calcularPromedio() {
     const n = parseInt(document.getElementById("cantidad").value);
-    let suma = 0;
+
+    let sumaPonderada = 0;
+    let totalCreditos = 0;
+    let detalle = "";
 
     for (let i = 1; i <= n; i++) {
-        suma += parseFloat(document.getElementById("nota" + i).value);
+        const nota = parseFloat(document.getElementById("nota" + i).value);
+        const creditos = parseFloat(document.getElementById("creditos" + i).value);
+
+        if (!isNaN(nota) && !isNaN(creditos)) {
+            sumaPonderada += nota * creditos;
+            totalCreditos += creditos;
+
+            // Mostrar detalle por curso
+            detalle += `${nota} × ${creditos} = ${(nota * creditos).toFixed(2)}<br>`;
+        }
     }
 
-    const promedio = suma / n;
+    const promedio = sumaPonderada / totalCreditos;
 
+    // Mostrar resultado
     document.getElementById("resultado").innerHTML =
-        `<h3>Promedio: ${promedio.toFixed(2)}</h3>`;
+        `<h3>Promedio ponderado: ${promedio.toFixed(2)}</h3>`;
+
+    // Mostrar cálculo paso a paso
+    document.getElementById("detalle").innerHTML =
+        `<b>Cálculo paso a paso:</b><br><br>
+        ${detalle}
+        <br><b>Total ponderado:</b> ${sumaPonderada.toFixed(2)}<br>
+        <b>Total créditos:</b> ${totalCreditos}<br><br>
+        <b>Promedio final = ${sumaPonderada.toFixed(2)} / ${totalCreditos} = ${promedio.toFixed(2)}</b>`;
 }
+
 </script>
 
 </body>
